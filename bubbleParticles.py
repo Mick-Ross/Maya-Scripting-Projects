@@ -10,39 +10,44 @@ import math
 ### HELPER METHODS ###
 
 # must sort rA, rB, rD in descending order! 
-def getRadGhost(bigRad, smallRad) {
+def getRadGhost(bigRad, smallRad):
     return (bigRad*smallRad)/(bigRad - smallRad)
-}
 
-def getDistBubCenters(bigRad, smallRad) {
-    return sqrt(bigRad*bigRad + smallRad*smallRad - bigRad*smallRad)
-}
 
-def getDistBigToGhost(bigRad, ghostRad) {
-    return sqrt(bigRad*bigRad + ghostRad*ghostRad + bigRad*ghostRad)
-}
+def getDistBubCenters(bigRad, smallRad):
+    return math.sqrt(bigRad*bigRad + smallRad*smallRad - bigRad*smallRad)
+
+def getDistBigToGhost(bigRad, ghostRad):
+    return math.sqrt(bigRad*bigRad + ghostRad*ghostRad + bigRad*ghostRad)
 
 ### MAIN ###
 
-# TODO: implement Maya UI support to accept 3 radii
-# hard code in radii values
+## TODO: implement Maya UI support to accept 3 radii
+## hard code in radii values
 
+## A, B, D real bubbles |||| C, E, F ghost bubbles
 radA = 3.2
 radB = 2.1
 radD = 0.3
 
-## May want to clean up this redundant code
-# find bubble C, modifies A and B
+### May want to clean up this redundant code
+## find bubble C, modifies A and B
 distAB = getDistBubCenters(radA, radB)
 radCGhost = getRadGhost(radA, radB)
 distAC = getDistBigToGhost(radA, radCGhost)
 
-# find bubble E, modifies A and D
+## find bubble E, modifies A and D
 distAD = getDistBubCenters(radA, radD)
 radEGhost = getRadGhost(radA, radD)
 distAE = getDistBigToGhost(radA, radEGhost)
 
-# find bubble F, modifies B and D
+## find bubble F, modifies B and D
 distBD = getDistBubCenters(radB, radD)
 radFGhost = getRadGhost(radB, radD)
 distBF = getDistBigToGhost(radB, radFGhost)
+
+## determine position of D
+thetaA = math.acos(((distBD*distBD)-(distAB*distAB)-(distAD*distAD))/(2*distAB*distAD))
+
+# we will want vec3s to define position of sphere
+dCenter = [distAD*math.cos(thetaA), -distAD*math.sin(thetaA), 0.0]
