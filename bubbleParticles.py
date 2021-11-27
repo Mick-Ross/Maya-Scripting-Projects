@@ -1,5 +1,6 @@
 import maya.cmds as cmd
 import math
+from operator import add, sub
 # sources:
     # Referenced paper:
 # https://www.glassner.com/wp-content/uploads/2014/04/CG-CGA-PDF-00-11-Soap-Bubbles-2-Nov00.pdf
@@ -19,6 +20,10 @@ def getDistBubCenters(bigRad, smallRad):
 
 def getDistBigToGhost(bigRad, ghostRad):
     return math.sqrt(bigRad*bigRad + ghostRad*ghostRad + bigRad*ghostRad)
+    
+def normalize(lst):
+    s = sum(lst)
+    return list(map(lambda x: float(x)/s, lst))
 
 ### MAIN ###
 
@@ -50,4 +55,15 @@ distBF = getDistBigToGhost(radB, radFGhost)
 thetaA = math.acos(((distBD*distBD)-(distAB*distAB)-(distAD*distAD))/(2*distAB*distAD))
 
 # we will want vec3s to define position of sphere
+# bubbles defined in XY plane
 dCenter = [distAD*math.cos(thetaA), -distAD*math.sin(thetaA), 0.0]
+
+# find position of E
+dirAtoD = normalize(dCenter)
+eCenter = [distAE*x for x in dirAtoD]
+
+# find position of F
+dirBtoD = normalize(list(map(sub, dCenter, [distAB, 0.0, 0.0])))
+fCenter = list(map(add, [distAB, 0.0, 0.0], [distBF*x for x in dirBtoD]))
+
+### FINALLY MAKE THE SPHERES
